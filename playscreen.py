@@ -90,7 +90,7 @@ Builder.load_string("""
         Label:
             size_hint_y: None
             height: dp(24)
-            text: 'Spacebar to Toggle Play/Stop'
+            # text: 'Spacebar to Toggle Play/Stop'
 """)
 
 
