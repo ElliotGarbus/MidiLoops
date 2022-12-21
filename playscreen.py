@@ -4,46 +4,99 @@ from kivy.uix.screenmanager import Screen
 from kivy.core.window import Window
 from kivy.clock import Clock
 from kivy.lang import Builder
-from kivy.utils import platform
+from kivy.uix.boxlayout import BoxLayout
+from kivy.properties import NumericProperty, StringProperty
 
 from pathlib import Path
-import subprocess
-import shlex
 
 Builder.load_string("""
+<ContentControl>:
+    padding: dp(20)
+    size_hint_y: None
+    height: 130
+    canvas:
+        Color:
+            rgb: .5, .5, .5
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+    Label:
+        text: f'{root.pc}'
+        size_hint_x: None
+        width: 50
+        font_size: 20
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            size_hint_y: None
+            height: dp(48)
+            ToggleButton:
+                id: tb
+                text: root.title
+                group: 'track'
+            Button:
+                id: delete_button
+                text: 'X'
+                size_hint_x: None
+                width: 20
+        BoxLayout:
+            Slider:
+                id: volume
+                max: 127
+                value: root.volume
+            Label:
+                text: f'{volume.value:.0f}'
+                size_hint_x: None
+                width: 40
+
+
+
 <PlayScreen>:
     BoxLayout:
         orientation: 'vertical'
-        Label:
-            id: file
-            text: 'Background Track Player'  # Replace with filename
-            font_size: sp(20)
+        ScrollView:
+            do_scroll_x: False
+            scroll_type: ['bars', 'content']
+            bar_width: dp(20)
+            bar_inactive_color:  [.7, .7, .7, .5]
+            BoxLayout:
+                id: scroll_box
+                padding: dp(10)
+                spacing: dp(10)
+                orientation: 'vertical'
+                size_hint: None, None
+                width: self.parent.width - dp(20)
+                height: self.minimum_height
+                
         Label:
             size_hint_y: None
             height: dp(24)
-            text: 'Drop File in Window'
+            text: 'Drop File on Loop Block'
         BoxLayout:
             size_hint_y: None
             height: dp(48)
             Button:
-                text: 'Restart'
-                # on_release: root.restart()
+                text: 'Clear All'
             ToggleButton:
                 id: play_toggle
                 text: {'normal': 'Play', 'down': 'Stop'} [self.state]
                 # on_state:
                 #     if self.state == 'down': root.play()
                 #     if self.state == 'normal': root.stop()
-            Spinner:
-                id: speed
-                # text: root.speeds[2]
-                # values: root.speeds
-                # on_text: root.set_file(self.text)
+            Button:
+                text: 'Next'
         Label:
             size_hint_y: None
             height: dp(24)
             text: 'Spacebar to Toggle Play/Stop'
 """)
+
+
+class ContentControl(BoxLayout):
+    pc = NumericProperty()
+    title = StringProperty('--EMPTY--')
+    path = StringProperty()
+    volume = NumericProperty(64)
 
 
 class PlayScreen(Screen):
@@ -54,8 +107,15 @@ class PlayScreen(Screen):
         # self.track_path = None  # holds the name of the 1x speed track
         # self.track_stretched = None  # name of stretched track
         # self.time_stretch_processes = {}
+        Window.bind(on_drop_file=self._drop_file_action)
         self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
+
+    def on_kv_post(self, base_widget):
+        scroll_box = self.ids.scroll_box
+        for i in range(128):
+            scroll_box.add_widget(ContentControl(pc=i))
+
 
     def _keyboard_closed(self):
         self._keyboard.unbind(on_key_down=self._on_keyboard_down)
@@ -66,6 +126,17 @@ class PlayScreen(Screen):
             # self.ids.play_toggle.state = 'down' if self.ids.play_toggle.state == 'normal' else 'normal'
             pass
             # todo: add spacebar action here
+
+    def _drop_file_action(self, window, filename, *_):
+        # the x,y passed into the drop_file event are in sdl coordinates, use mouse_pos
+        x, y = window.mouse_pos
+        for button in self.ids.scroll_box.children:
+            if button.collide_point(*button.to_widget(x, y)):
+                button.path = filename.decode("utf-8")
+                button.title = Path(button.path).stem
+                break
+
+
 
     # def set_backing_track(self, path):
     #     self.ids.speed.text = 'Speed 1x'
