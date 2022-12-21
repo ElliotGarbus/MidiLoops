@@ -77,9 +77,9 @@ Builder.load_string("""
             height: dp(48)
             Button:
                 text: 'Clear All'
-            ToggleButton:
+            Button:
                 id: play_toggle
-                text: {'normal': 'Play', 'down': 'Stop'} [self.state]
+                text: 'Stop'
                 # on_state:
                 #     if self.state == 'down': root.play()
                 #     if self.state == 'normal': root.stop()
