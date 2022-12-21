@@ -9,6 +9,8 @@ from kivy.properties import NumericProperty, StringProperty
 
 from pathlib import Path
 
+# todo next: Add Audio and get files playing
+
 Builder.load_string("""
 <ContentControl>:
     padding: dp(20)
@@ -94,7 +96,7 @@ Builder.load_string("""
 
 class ContentControl(BoxLayout):
     pc = NumericProperty()
-    title = StringProperty('--EMPTY--')
+    title = StringProperty('<Empty>')
     path = StringProperty()
     volume = NumericProperty(64)
 
