@@ -13,7 +13,10 @@ import functools
 import playscreen
 import monitorscreen
 
-
+#  todo: audio
+#  todo: config/files - save restore state
+#  todo: midi functionality
+#  todo: Update midi monior
 #  todo: update cc popup
 
 
@@ -118,12 +121,16 @@ BoxLayout:
         height: dp(48)
         Label:
             text: 'Midi Device & Channel'
+            size_hint_x: None
+            width: dp(200)
         Spinner:
             id: midi_devices
             text: 'Select Midi Device'
             on_text: app.mc.set_midi_port(self.text)
         Spinner:
             id: midi_ch
+            size_hint_x: None
+            width: dp(200)
             text: 'Select Midi Channel'
             values: [str(n) for n in range(1, 17)]
             on_text: app.mc.set_midi_channel(self.text)
