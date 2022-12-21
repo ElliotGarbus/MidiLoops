@@ -4,7 +4,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import NumericProperty
 
 kv = """
-<ContentControl@BoxLayout>:
+<ContentControl>:
     padding: dp(20)
     size_hint_y: None
     height: 130
@@ -38,7 +38,7 @@ kv = """
                 id: volume
                 max: 127
             Label:
-                text: f'{int(volume.value)}'
+                text: f'{volume.value:.0f}'
                 size_hint_x: None
                 width: 40
 
