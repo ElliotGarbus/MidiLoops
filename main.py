@@ -170,7 +170,7 @@ class BackingTrackPlayerApp(App):
         Window.minimum_width = window_width
         Window.minimum_height = window_height
         # Window.size = 800, 375
-        Window.bind(on_dropfile=self._dropfile_action)
+        # Window.bind(on_dropfile=self._dropfile_action)
         Window.bind(on_request_close=self.window_request_close)
         return Builder.load_string(kv)
 
