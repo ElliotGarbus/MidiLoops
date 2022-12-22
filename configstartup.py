@@ -18,9 +18,9 @@ window_top = 50
 window_left = 100
 
 if platform == 'win':
-    ini_file = Path(os.environ['APPDATA']) / Path('backingtrackplayer') / 'backingtrackplayer.ini'
+    ini_file = Path(os.environ['APPDATA']) / Path('midiloops') / 'midiloops.ini'
 else:  # macosx
-    ini_file = Path('~/Library/Application Support/backingtrackplayer/backingtrackplayer.ini').expanduser()
+    ini_file = Path('~/Library/Application Support/midiloops/midiloops.ini').expanduser()
 
 # Use Python lib configparser to read .ini file prior to app startup
 parser = configparser.ConfigParser()

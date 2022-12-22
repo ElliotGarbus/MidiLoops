@@ -13,7 +13,6 @@ import functools
 import playscreen
 import monitorscreen
 
-#  todo: audio
 #  todo: config/files - save restore state
 #  todo: midi functionality
 #  todo: Update midi monior
@@ -163,7 +162,7 @@ BoxLayout:
 """
 
 
-class BackingTrackPlayerApp(App):
+class MidiLoopsApp(App):
     recent_track_names = ListProperty()  # used to display names in most recent spinner
 
     def __init__(self, **kwargs):
@@ -176,35 +175,9 @@ class BackingTrackPlayerApp(App):
         self.use_kivy_settings = False
         Window.minimum_width = window_width
         Window.minimum_height = window_height
-        # Window.size = 800, 375
-        # Window.bind(on_dropfile=self._dropfile_action)
         Window.bind(on_request_close=self.window_request_close)
         return Builder.load_string(kv)
 
-    def _dropfile_action(self, _, path):
-        # self.root.ids.sm.get_screen('play_screen').set_backing_track(path.decode())
-        #
-        pass
-
-    # def add_recent(self, path):
-    #     self.recent_track_paths.insert(0, path)
-    #     if len(self.recent_track_paths) > 5:
-    #         self.recent_track_paths = self.recent_track_paths[:5]
-    #     self.recent_track_names = [Path(p).stem for p in self.recent_track_paths]
-
-    # def select_recent_track(self, track):
-    #     if track == 'Recent Tracks':
-    #         return
-    #     self.root.ids.recent.text = 'Recent Tracks'
-    #     self.root.ids.sm.get_screen('play_screen').ids.file.text = Path(track).stem
-    #     pm = functools.partial(self.continue_select_recent_track, track)
-    #     Clock.schedule_once(pm, .5)  # allow the recent tracks spinner to update
-
-    # def continue_select_recent_track(self, track, *args):
-    #     self.root.ids.sm.get_screen('play_screen').stop()
-    #     i = self.recent_track_names.index(track)
-    #     p = self.recent_track_paths[i]
-    #     self.root.ids.sm.get_screen('play_screen').set_backing_track(p)
 
     def on_start(self):
         names = self.mc.get_midi_ports()
@@ -232,12 +205,10 @@ class BackingTrackPlayerApp(App):
     def build_config(self, config):
         config.setdefaults('MIDI', {'input': 'None',
                                     'channel': 'None'})
-        # config.setdefaults('Track', {'song': 'None'})
         config.setdefaults('Window', {'width': window_width,
                                       'height': window_height,
                                       'top': window_top,
                                       'left': window_left})
-        # config.setdefaults('Recent Tracks', {'tracks': ''})
 
     def get_application_config(self, defaultpath='%(appdir)s/%(appname)s.ini'):
         if platform in ['win', 'macosx']:    # mac will not write into app folder
@@ -281,4 +252,4 @@ class BackingTrackPlayerApp(App):
         #             f.unlink()  # remove files not related to current track
 
 
-BackingTrackPlayerApp().run()
+MidiLoopsApp().run()
