@@ -3,15 +3,34 @@ from kivy.core.audio import SoundLoader
 from kivy.uix.screenmanager import Screen
 from kivy.core.window import Window
 from kivy.clock import Clock
+from kivy.uix.popup import Popup
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
-from kivy.properties import NumericProperty, StringProperty
+from kivy.properties import NumericProperty, StringProperty, ObjectProperty
 
 from pathlib import Path
 
-# todo next: Add Audio and get files playing
+# todo: Play Next
 
 Builder.load_string("""
+<ConfirmPopup>:
+    size_hint: None, None
+    size: 400, 200
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: root.message
+        BoxLayout:
+            size_hint_y: None
+            height: dp(48)
+            Button:
+                text: 'Cancel'
+                on_release: root.dismiss()
+            Button:
+                text: root.action_text
+                on_release: root.action()
+    
+
 <ContentControl>:
     padding: dp(20)
     size_hint_y: None
@@ -45,7 +64,7 @@ Builder.load_string("""
                 size_hint_x: None
                 width: 20
                 disabled: tb.text == '<Empty>'
-                on_release: root.clear()
+                on_release: root.request_clear()
         BoxLayout:
             Slider:
                 id: volume
@@ -83,17 +102,24 @@ Builder.load_string("""
             height: dp(48)
             Button:
                 text: 'Clear All'
+                on_release: root.clear_all_request()
             Button:
                 id: play_toggle
                 text: 'Stop'
                 on_release: root.stop()
             Button:
-                text: 'Next'
+                text: 'Play Next'
         Label:
             size_hint_y: None
             height: dp(24)
             # text: 'Spacebar to Toggle Play/Stop'
 """)
+
+
+class ConfirmPopup(Popup):
+    message = StringProperty()
+    action_text = StringProperty()
+    action = ObjectProperty()
 
 
 class ContentControl(BoxLayout):
@@ -105,6 +131,7 @@ class ContentControl(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.sound = None
+        self.popup = None # see clear_request
 
     def play_stop(self, state):
         if state == 'normal':
@@ -131,29 +158,41 @@ class ContentControl(BoxLayout):
         self.path = ''
         self.volume = 64
 
+    def clear_dismiss(self):
+        self.clear()
+        self.popup.dismiss()
+
+    def request_clear(self):
+        self.popup = ConfirmPopup(title='Confirm to clear',
+                                  message= f'Clear: {self.title}',
+                                  action_text='Clear',
+                                  action=self.clear_dismiss)
+        self.popup.open()
+
 
 class PlayScreen(Screen):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         Window.bind(on_drop_file=self._drop_file_action)
-        self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
-        self._keyboard.bind(on_key_down=self._on_keyboard_down)
+        # self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
+        # self._keyboard.bind(on_key_down=self._on_keyboard_down)
+        self.popup = None  # holds confirmation popup, see clear_all_request()
 
     def on_kv_post(self, base_widget):
         scroll_box = self.ids.scroll_box
         for i in range(128):
             scroll_box.add_widget(ContentControl(pc=i))
 
-    def _keyboard_closed(self):
-        self._keyboard.unbind(on_key_down=self._on_keyboard_down)
-        self._keyboard = None
-
-    def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
-        if keycode[1] == 'spacebar':  # Toggle between play and stop
-            # self.ids.play_toggle.state = 'down' if self.ids.play_toggle.state == 'normal' else 'normal'
-            pass
-            # todo: add spacebar action here
+    # def _keyboard_closed(self):
+    #     self._keyboard.unbind(on_key_down=self._on_keyboard_down)
+    #     self._keyboard = None
+    #
+    # def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
+    #     if keycode[1] == 'spacebar':  # Toggle between play and stop
+    #         # self.ids.play_toggle.state = 'down' if self.ids.play_toggle.state == 'normal' else 'normal'
+    #         pass
+    #         # todo: add spacebar action here
 
     def _drop_file_action(self, window, filename, *_):
         # the x,y passed into the drop_file event are in sdl coordinates, use mouse_pos
@@ -170,58 +209,18 @@ class PlayScreen(Screen):
     def stop(self):
         for button in self.ids.scroll_box.children:
             if button.sound and button.sound.state == 'play':
-                button.sound.stop()
+                button.ids.tb.state = 'normal'
 
+    def clear_all_request(self):
+        self.popup = ConfirmPopup(title='Confirm to clear',
+                                  message='Confirm to clear all loops',
+                                  action_text= 'Clear All',
+                                  action=self.clear_all)
+        self.popup.open()
 
-    # def set_backing_track(self, path):
-    #     self.ids.speed.text = 'Speed 1x'
-    #     self.track = SoundLoader.load(path)
-    #     if not self.track:
-    #         self.ids.file.text = self.error_msg
-    #         self.track_path = None
-    #     else:
-    #         self.track_path = path
-    #         self.ids.file.text = Path(path).stem
-    #         self.track.loop = True
-    #         self.time_stretch(path)
-    #
-    # def play(self):
-    #     try:
-    #         self.track.play()
-    #         self.ids.play_toggle.state = 'down'
-    #     except AttributeError:
-    #         self.ids.file.text = self.error_msg
-    #
-    # def stop(self):
-    #     try:
-    #         self.track.stop()
-    #         self.ids.play_toggle.state = 'normal'
-    #     except AttributeError:
-    #         self.ids.file.text = self.error_msg
-
-    # def restart(self):
-    #     try:
-    #         if self.track.state == 'stop':
-    #             self.ids.play_toggle.state = 'down'  # change is state cause track to play
-    #         else:
-    #             self.track.seek(0)
-    #             self.track.play()
-    #     except AttributeError:
-    #         self.file.text = self.error_msg
-    #
-    # def set_volume(self, v):  # v is from 0 to 127
-    #     try:
-    #         self.track.volume = v / 127
-    #     except AttributeError:
-    #         self.ids.file.text = self.error_msg
-    #
-    # def set_speed(self, value):
-    #     #  value from midi cc message : 1, 2, 3, 4, 5 for speeds  1x, 0.5x, .75x, 1.25x, 1.5x respectively
-    #     if value not in [1, 2, 3, 4, 5]:
-    #         return
-    #     m_speeds = ['Speed 1x', 'Speed 0.5x', 'Speed 0.75x', 'Speed 1.25x', 'Speed 1.5x']
-    #     self.ids.speed.text = m_speeds[value - 1]
-
-
+    def clear_all(self):
+        for button in self.ids.scroll_box.children:
+            button.clear()
+        self.popup.dismiss()
 
 
