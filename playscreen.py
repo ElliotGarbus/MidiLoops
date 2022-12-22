@@ -6,8 +6,10 @@ from kivy.uix.popup import Popup
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import BooleanProperty, NumericProperty, StringProperty, ObjectProperty
+from kivy.logger import Logger
 
 from pathlib import Path
+import json
 
 
 Builder.load_string("""
@@ -233,3 +235,21 @@ class PlayScreen(Screen):
         state = [w.ids.tb.state for w in self.ids.scroll_box.children]
         self.is_playing = 'down' in state
 
+    def save_playlist(self, path):
+        playlist = [{'pc': w.pc,
+                     'title': w.title,
+                     'path': w.path,
+                     'volume': w.volume} for w in self.ids.scroll_box.children[::-1]]
+        file = Path(path) / 'playlist.txt'
+        with open(file, 'w') as f:
+            try:
+                json.dump(playlist, f)
+            except OSError as e:
+
+
+
+
+    def load_playlist(self, path):
+        p = Path(path) / 'playlist.txt'
+        print(p)
+        print(p.exists())

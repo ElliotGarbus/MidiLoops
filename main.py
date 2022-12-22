@@ -80,9 +80,6 @@ kv = """
 <LeftLabel@Label>:
     size_hint_x: None
     width: dp(75)
-    # text_size: self.size
-    # halign: 'right'
-    # valign: 'center' 
     padding: dp(5), dp(5)
     canvas:
         Color:
@@ -133,14 +130,6 @@ BoxLayout:
             text: 'Select Midi Channel'
             values: [str(n) for n in range(1, 17)]
             on_text: app.mc.set_midi_channel(self.text)
-    # Spinner:
-    #     id: recent
-    #     size_hint_y: None
-    #     height: 48
-    #     text: 'Recent Tracks'
-    #     values: app.recent_track_names
-    #     on_text: app.select_recent_track(self.text)
-    #     
     ScreenManager:
         id: sm
         PlayScreen:
@@ -184,19 +173,12 @@ class MidiLoopsApp(App):
         self.root.ids.midi_devices.values = names
         m_input = self.config.getdefault('MIDI', 'input', 'None')
         ch = self.config.get('MIDI', 'channel')
-        # song = self.config.get('Track', 'song')
-        # if not Path(song).exists():     # if track that was in config file was no longer exists...
-        #     song = 'None'
-        # self.root.ids.sm.get_screen('play_screen').set_backing_track(song)
-        # self.recent_track_paths = [t for t in self.config.get('Recent Tracks','tracks').split(',') if t]
-        # self.recent_track_names = [Path(p).stem for p in self.recent_track_paths]
-
-        # before set midi ports - so errors can show in track area
         if m_input in names:
             self.mc.set_midi_port(m_input)
             self.mc.midi_channel = int(ch)
             self.root.ids.midi_devices.text = m_input
             self.root.ids.midi_ch.text = str(int(ch) + 1)
+        self.root.ids.sm.get_screen('play_screen').load_playlist(self.user_data_dir)
         Clock.schedule_interval(self.mc.read_midi_callback, .1)
 
     def open_settings(self, *largs):  # kivy control panel will not open
@@ -229,27 +211,12 @@ class MidiLoopsApp(App):
 
     def on_stop(self):
         # Save config file here
-        pass
-
-        # p = self.root.ids.sm.get_screen('play_screen').track_path
-        # # update config file
-        # if p:
-        #     self.config.set('Track', 'song', p)
-        #     tracks = ','.join(self.recent_track_paths)
-        #     self.config.set('Recent Tracks', 'tracks', tracks)
-        #     self.config.write()
-        # if self.mc.midi_in_port and self.mc.midi_channel is not None:
-        #     self.config.set('MIDI', 'input', self.mc.midi_in_port.name)
-        #     self.config.set('MIDI', 'channel', self.mc.midi_channel)
-        #     self.config.write()
-        # # clean up old files
-        # if p:
-        #     fn = Path(p)
-        #     suffix = fn.suffix
-        #     speed_dir = Path(self.user_data_dir) / 'speeds'
-        #     for f in speed_dir.glob('*'):
-        #         if f.stem[:-4] + suffix != fn.name:
-        #             f.unlink()  # remove files not related to current track
+        if self.mc.midi_in_port and self.mc.midi_channel is not None:
+            self.config.set('MIDI', 'input', self.mc.midi_in_port.name)
+            self.config.set('MIDI', 'channel', self.mc.midi_channel)
+            self.config.write()
+        # Save playlist
+        self.root.ids.sm.get_screen('play_screen').save_playlist(self.user_data_dir)
 
 
 MidiLoopsApp().run()
