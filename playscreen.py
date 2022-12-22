@@ -9,7 +9,6 @@ from kivy.properties import BooleanProperty, NumericProperty, StringProperty, Ob
 
 from pathlib import Path
 
-# todo: Play Next
 
 Builder.load_string("""
 <ConfirmPopup>:
