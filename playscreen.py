@@ -6,7 +6,7 @@ from kivy.clock import Clock
 from kivy.uix.popup import Popup
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
-from kivy.properties import NumericProperty, StringProperty, ObjectProperty
+from kivy.properties import BooleanProperty, NumericProperty, StringProperty, ObjectProperty
 
 from pathlib import Path
 
@@ -109,6 +109,8 @@ Builder.load_string("""
                 on_release: root.stop()
             Button:
                 text: 'Play Next'
+                on_release: root.play_next()
+                disabled: not root.is_playing
         Label:
             size_hint_y: None
             height: dp(24)
@@ -134,6 +136,8 @@ class ContentControl(BoxLayout):
         self.popup = None # see clear_request
 
     def play_stop(self, state):
+        app = App.get_running_app()
+        app.root.ids.sm.get_screen('play_screen').update_play_state()
         if state == 'normal':
             if self.sound:
                 self.sound.stop()
@@ -157,6 +161,7 @@ class ContentControl(BoxLayout):
         self.title = '<Empty>'
         self.path = ''
         self.volume = 64
+        self.sound = None
 
     def clear_dismiss(self):
         self.clear()
@@ -171,6 +176,7 @@ class ContentControl(BoxLayout):
 
 
 class PlayScreen(Screen):
+    is_playing = BooleanProperty(False)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -183,16 +189,6 @@ class PlayScreen(Screen):
         scroll_box = self.ids.scroll_box
         for i in range(128):
             scroll_box.add_widget(ContentControl(pc=i))
-
-    # def _keyboard_closed(self):
-    #     self._keyboard.unbind(on_key_down=self._on_keyboard_down)
-    #     self._keyboard = None
-    #
-    # def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
-    #     if keycode[1] == 'spacebar':  # Toggle between play and stop
-    #         # self.ids.play_toggle.state = 'down' if self.ids.play_toggle.state == 'normal' else 'normal'
-    #         pass
-    #         # todo: add spacebar action here
 
     def _drop_file_action(self, window, filename, *_):
         # the x,y passed into the drop_file event are in sdl coordinates, use mouse_pos
@@ -223,4 +219,19 @@ class PlayScreen(Screen):
             button.clear()
         self.popup.dismiss()
 
+    def play_next(self):
+        # play the next loop
+        # collect all the tracks that have audio loaded
+        loaded = [w for w in self.ids.scroll_box.children[::-1] if w.sound]
+        # find the currently playing track
+        for track in loaded:
+            if track.sound.state == 'play':
+                i = loaded.index(track)
+                loaded[i].ids.tb.state = 'normal'
+                loaded[(i+1) % len(loaded)].ids.tb.state = 'down'
+                break
+
+    def update_play_state(self):
+        state = [w.ids.tb.state for w in self.ids.scroll_box.children[::-1]]
+        self.is_playing = 'down' in state
 
