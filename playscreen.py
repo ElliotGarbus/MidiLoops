@@ -111,15 +111,16 @@ class ContentControl(BoxLayout):
 
     def play_stop(self, state):
         if state == 'normal':
-            self.sound.stop()
+            if self.sound:
+                self.sound.stop()
         elif state == 'down':
-            try:
-                self.sound = SoundLoader.load(self.path)
+            if self.sound:
                 self.sound.loop = True
                 self.sound.volume = self.volume/127
                 self.sound.play()
-            except OSError:
-                print('file not found or bad format')
+                return
+            else:
+                self.clear()
 
     def set_volume(self, vol):
         if self.sound and self.sound.state == 'play':
@@ -139,10 +140,6 @@ class PlayScreen(Screen):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # self.track = None
-        # self.track_path = None  # holds the name of the 1x speed track
-        # self.track_stretched = None  # name of stretched track
-        # self.time_stretch_processes = {}
         Window.bind(on_drop_file=self._drop_file_action)
         self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
@@ -169,6 +166,9 @@ class PlayScreen(Screen):
             if button.collide_point(*button.to_widget(x, y)):
                 button.path = filename.decode("utf-8")
                 button.title = Path(button.path).stem
+                button.sound = SoundLoader.load(button.path)
+                if not button.sound:
+                    button.clear()
                 break
 
 
