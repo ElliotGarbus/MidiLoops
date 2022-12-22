@@ -36,16 +36,21 @@ Builder.load_string("""
                 id: tb
                 text: root.title
                 group: 'track'
+                on_state: root.play_stop(self.state)
+                disabled: self.text == '<Empty>' 
             Button:
                 id: delete_button
                 text: 'X'
                 size_hint_x: None
                 width: 20
+                disabled: tb.text == '<Empty>'
+                on_release: root.clear()
         BoxLayout:
             Slider:
                 id: volume
                 max: 127
                 value: root.volume
+                on_value: root.set_volume(self.value)
             Label:
                 text: f'{volume.value:.0f}'
                 size_hint_x: None
@@ -98,7 +103,36 @@ class ContentControl(BoxLayout):
     pc = NumericProperty()
     title = StringProperty('<Empty>')
     path = StringProperty()
-    volume = NumericProperty(64)
+    volume = NumericProperty(64)  # a value from 0-127, note sound obj volume is from 0-1
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.sound = None
+
+    def play_stop(self, state):
+        if state == 'normal':
+            self.sound.stop()
+        elif state == 'down':
+            try:
+                self.sound = SoundLoader.load(self.path)
+                self.sound.loop = True
+                self.sound.volume = self.volume/127
+                self.sound.play()
+            except OSError:
+                print('file not found or bad format')
+
+    def set_volume(self, vol):
+        if self.sound and self.sound.state == 'play':
+            self.volume = int(vol)
+            self.sound.volume = vol/127
+        else:
+            self.volume = int(vol)
+
+    def clear(self):
+        self.ids.tb.state = 'normal'
+        self.title = '<Empty>'
+        self.path = ''
+        self.volume = 64
 
 
 class PlayScreen(Screen):
@@ -117,7 +151,6 @@ class PlayScreen(Screen):
         scroll_box = self.ids.scroll_box
         for i in range(128):
             scroll_box.add_widget(ContentControl(pc=i))
-
 
     def _keyboard_closed(self):
         self._keyboard.unbind(on_key_down=self._on_keyboard_down)
