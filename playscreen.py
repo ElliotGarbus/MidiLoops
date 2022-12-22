@@ -41,6 +41,7 @@ Builder.load_string("""
             Button:
                 id: delete_button
                 text: 'X'
+                color: 'red'
                 size_hint_x: None
                 width: 20
                 disabled: tb.text == '<Empty>'
@@ -55,8 +56,6 @@ Builder.load_string("""
                 text: f'{volume.value:.0f}'
                 size_hint_x: None
                 width: 40
-
-
 
 <PlayScreen>:
     BoxLayout:
@@ -87,9 +86,7 @@ Builder.load_string("""
             Button:
                 id: play_toggle
                 text: 'Stop'
-                # on_state:
-                #     if self.state == 'down': root.play()
-                #     if self.state == 'normal': root.stop()
+                on_release: root.stop()
             Button:
                 text: 'Next'
         Label:
@@ -118,7 +115,6 @@ class ContentControl(BoxLayout):
                 self.sound.loop = True
                 self.sound.volume = self.volume/127
                 self.sound.play()
-                return
             else:
                 self.clear()
 
@@ -171,6 +167,10 @@ class PlayScreen(Screen):
                     button.clear()
                 break
 
+    def stop(self):
+        for button in self.ids.scroll_box.children:
+            if button.sound and button.sound.state == 'play':
+                button.sound.stop()
 
 
     # def set_backing_track(self, path):
