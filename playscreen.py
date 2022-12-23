@@ -185,10 +185,10 @@ class PlayScreen(Screen):
         # self._keyboard.bind(on_key_down=self._on_keyboard_down)
         self.popup = None  # holds confirmation popup, see clear_all_request()
 
-    def on_kv_post(self, base_widget):
-        scroll_box = self.ids.scroll_box
-        for i in range(128):
-            scroll_box.add_widget(ContentControl(pc=i))
+    # def on_kv_post(self, base_widget):
+    #     scroll_box = self.ids.scroll_box
+    #     for i in range(128):
+    #         scroll_box.add_widget(ContentControl(pc=i))
 
     def _drop_file_action(self, window, filename, *_):
         # the x,y passed into the drop_file event are in sdl coordinates, use mouse_pos
@@ -245,11 +245,18 @@ class PlayScreen(Screen):
             try:
                 json.dump(playlist, f)
             except OSError as e:
-
-
-
+                # LOG ERROR HERE
+                Logger.exception(f'Application: Error is save_playlist: {e}')
 
     def load_playlist(self, path):
         p = Path(path) / 'playlist.txt'
-        print(p)
-        print(p.exists())
+        scroll_box = self.ids.scroll_box
+        try:
+            with open(p) as f:
+                playlist = json.load(f)
+                for d_args in playlist:
+                    scroll_box.add_widget(ContentControl(**d_args))
+        except (FileExistsError, json.JSONDecodeError):
+            for i in range(128):
+                scroll_box.add_widget(ContentControl(pc=i))
+
