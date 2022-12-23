@@ -28,13 +28,13 @@ PC message is received it will stop. The BackingTrackPlayer responds to the foll
 
 **CC Messages**
 
-Action | CC# | CC Value
--------|-----|---------
-Play | 1 | 00
-Stop | 1 | 127
-Volume|3| 0-127
+Action | CC# | CC Value | Notes
+-------|-----|---------|------------|
+Stop | 1 | any | Stop playing
+Next | 2 | any | stop the playing, start the next loop
+Volume|3| 0-127 | set the volume for the playing loop
 
-Play and Stop use CC#1 to make it easy to set up a midi toggle switch to stop/start.
 The audio loops by default.
+Use PC to start a loop.
 
 

@@ -114,7 +114,7 @@ Builder.load_string("""
         Label:
             size_hint_y: None
             height: dp(24)
-            # text: 'Spacebar to Toggle Play/Stop'
+            # text: 'Space bar to Toggle Play/Stop'
 """)
 
 
@@ -133,7 +133,7 @@ class ContentControl(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.sound = None
-        self.popup = None # see clear_request
+        self.popup = None  # see clear_request
 
     def play_stop(self, state):
         app = App.get_running_app()
@@ -169,7 +169,7 @@ class ContentControl(BoxLayout):
 
     def request_clear(self):
         self.popup = ConfirmPopup(title='Confirm to clear',
-                                  message= f'Clear: {self.title}',
+                                  message=f'Clear: {self.title}',
                                   action_text='Clear',
                                   action=self.clear_dismiss)
         self.popup.open()
@@ -203,7 +203,7 @@ class PlayScreen(Screen):
     def clear_all_request(self):
         self.popup = ConfirmPopup(title='Confirm to clear',
                                   message='Confirm to clear all loops',
-                                  action_text= 'Clear All',
+                                  action_text='Clear All',
                                   action=self.clear_all)
         self.popup.open()
 
@@ -252,4 +252,3 @@ class PlayScreen(Screen):
         except (FileNotFoundError, json.JSONDecodeError):
             for i in range(128):
                 scroll_box.add_widget(ContentControl(pc=i))
-

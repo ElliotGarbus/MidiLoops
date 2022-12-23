@@ -7,7 +7,7 @@ from kivy.logger import Logger
 class MidiControl:
     def __init__(self):
         self.midi_channel = None
-        self.midi_in_names = None  # Names of all of the midi input ports
+        self.midi_in_names = None  # Names of all midi input ports
         self.midi_in_port = None
 
     def get_midi_ports(self):
@@ -54,3 +54,5 @@ class MidiControl:
                         p.set_volume(msg.value)
                     elif msg.control == 4:
                         p.set_speed(msg.value)
+                elif msg.type == 'program_change' and msg.channel == self.midi_channel:
+                    print('PC received')
