@@ -13,7 +13,7 @@ This code must be at the top of the 'main' executable file.
 
 # Default window size and position, also used to set minimum window size
 window_width = 800
-window_height = 375
+window_height = 500
 window_top = 50
 window_left = 100
 

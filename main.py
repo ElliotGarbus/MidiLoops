@@ -13,7 +13,6 @@ import functools
 import playscreen
 import monitorscreen
 
-#  todo: config/files - save restore state
 #  todo: midi functionality
 #  todo: Update midi monior
 #  todo: update cc popup

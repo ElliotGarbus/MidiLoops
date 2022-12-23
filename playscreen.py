@@ -181,14 +181,7 @@ class PlayScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         Window.bind(on_drop_file=self._drop_file_action)
-        # self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
-        # self._keyboard.bind(on_key_down=self._on_keyboard_down)
         self.popup = None  # holds confirmation popup, see clear_all_request()
-
-    # def on_kv_post(self, base_widget):
-    #     scroll_box = self.ids.scroll_box
-    #     for i in range(128):
-    #         scroll_box.add_widget(ContentControl(pc=i))
 
     def _drop_file_action(self, window, filename, *_):
         # the x,y passed into the drop_file event are in sdl coordinates, use mouse_pos
@@ -256,7 +249,7 @@ class PlayScreen(Screen):
                 playlist = json.load(f)
                 for d_args in playlist:
                     scroll_box.add_widget(ContentControl(**d_args))
-        except (FileExistsError, json.JSONDecodeError):
+        except (FileNotFoundError, json.JSONDecodeError):
             for i in range(128):
                 scroll_box.add_widget(ContentControl(pc=i))
 
