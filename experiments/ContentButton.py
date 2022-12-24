@@ -51,6 +51,7 @@ BoxLayout:
 
 """
 
+
 class ContentControl(BoxLayout):
     pc = NumericProperty()
 
@@ -62,5 +63,6 @@ class ContentControlApp(App):
     def on_start(self):
         for i in range(4):
             self.root.add_widget(ContentControl(pc=i))
+
 
 ContentControlApp().run()

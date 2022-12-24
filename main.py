@@ -8,8 +8,6 @@ from kivy.metrics import Metrics
 from kivy.properties import ListProperty
 
 from midi_control import MidiControl
-from pathlib import Path
-import functools
 import playscreen
 import monitorscreen
 
@@ -164,7 +162,6 @@ class MidiLoopsApp(App):
         Window.minimum_height = window_height
         Window.bind(on_request_close=self.window_request_close)
         return Builder.load_string(kv)
-
 
     def on_start(self):
         names = self.mc.get_midi_ports()

@@ -38,6 +38,7 @@ class RV(RecycleView):
     def on_kv_post(self, base_widget):
         self.data = [{'text': f'Button {i}', 'index': i} for i in range(128)]
 
+
 class ScrollDropApp(App):
     def build(self):
         Window.bind(on_drop_file=self.drop_file)

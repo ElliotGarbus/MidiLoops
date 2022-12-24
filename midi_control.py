@@ -60,5 +60,3 @@ class MidiControl:
                         p.set_volume(msg.value)
                 elif msg.type == 'program_change' and msg.channel == self.midi_channel:
                     p.play_pc(msg.program)
-
-
