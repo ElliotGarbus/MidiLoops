@@ -80,6 +80,7 @@ Builder.load_string("""
     BoxLayout:
         orientation: 'vertical'
         ScrollView:
+            id: scroll
             do_scroll_x: False
             scroll_type: ['bars', 'content']
             bar_width: dp(20)
@@ -134,6 +135,10 @@ class ContentControl(BoxLayout):
         super().__init__(**kwargs)
         self.sound = None
         self.popup = None  # see clear_request
+        if self.path:
+            self.sound = SoundLoader.load(self.path)
+            if not self.sound:
+                self.clear()
 
     def play_stop(self, state):
         app = App.get_running_app()
@@ -141,17 +146,14 @@ class ContentControl(BoxLayout):
         if state == 'normal':
             if self.sound:
                 self.sound.stop()
-        elif state == 'down':
-            if self.sound:
-                self.sound.loop = True
-                self.sound.volume = self.volume/127
-                self.sound.play()
-            else:
-                self.clear()
+        elif self.sound:     # state == 'down':
+            self.sound.loop = True
+            self.sound.volume = self.volume/127
+            self.sound.play()
 
     def set_volume(self, vol):
         if self.sound and self.sound.state == 'play':
-            self.volume = int(vol)
+            self.volume = int(vol)  # vol can be a float from spinner 0 - 127
             self.sound.volume = vol/127
         else:
             self.volume = int(vol)
@@ -224,9 +226,25 @@ class PlayScreen(Screen):
                 loaded[(i+1) % len(loaded)].ids.tb.state = 'down'
                 break
 
+    def set_volume(self, midi_vol):
+        loaded = [w for w in self.ids.scroll_box.children[::-1] if w.sound]
+        # find the currently playing track
+        for track in loaded:
+            if track.sound.state == 'play':
+                track.set_volume(midi_vol)
+                break
+
     def update_play_state(self):
         state = [w.ids.tb.state for w in self.ids.scroll_box.children]
         self.is_playing = 'down' in state
+
+    def play_pc(self, pc):
+        track = [w for w in self.ids.scroll_box.children[::-1]][pc]
+        self.stop()
+        if track.sound:
+            track.sound.play()
+            track.ids.tb.state = 'down'
+            self.ids.scroll.scroll_to(track)
 
     def save_playlist(self, path):
         playlist = [{'pc': w.pc,
@@ -247,8 +265,8 @@ class PlayScreen(Screen):
         try:
             with open(p) as f:
                 playlist = json.load(f)
-                for d_args in playlist:
-                    scroll_box.add_widget(ContentControl(**d_args))
+            for d_args in playlist:
+                scroll_box.add_widget(ContentControl(**d_args))
         except (FileNotFoundError, json.JSONDecodeError):
             for i in range(128):
                 scroll_box.add_widget(ContentControl(pc=i))

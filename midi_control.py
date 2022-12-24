@@ -38,6 +38,13 @@ class MidiControl:
         self.midi_channel = int(ch) - 1
 
     def read_midi_callback(self, _):  # called from Clock.schedule_interval, does not use dt
+        """
+        | Action | CC# | CC Value | Notes                                  |
+        |--------|-----|----------|----------------------------------------|
+        | Stop   | 1   | any      | Stop playing                           |
+        | Next   | 2   | any      | stop current loop, start the next loop |
+        | Volume | 3   | 0-127    | set the volume for the playing loop    |
+        """
         app = App.get_running_app()
         p = app.root.ids.sm.get_screen('play_screen')
         if self.midi_in_port:
@@ -46,13 +53,12 @@ class MidiControl:
                     app.root.ids.sm.get_screen('midi_monitor').add_line(msg)
                 if msg.type == 'control_change' and msg.channel == self.midi_channel:
                     if msg.control == 1:  # play or stop
-                        if msg.value == 0:
-                            p.play()
-                        elif msg.value == 127:
-                            p.stop()
+                        p.stop()
+                    elif msg.control == 2:
+                        p.play_next()
                     elif msg.control == 3:  # Adjust playback volume
                         p.set_volume(msg.value)
-                    elif msg.control == 4:
-                        p.set_speed(msg.value)
                 elif msg.type == 'program_change' and msg.channel == self.midi_channel:
-                    print('PC received')
+                    p.play_pc(msg.program)
+
+
