@@ -78,19 +78,18 @@ class MidiMonitorScreen(Screen):
             midi_ch = int(app.root.ids.midi_ch.text) - 1
         except ValueError:
             midi_ch = -1  # if the channel has not been set, the int() conversion will fail
-        if msg.type == 'control_change' and msg.channel == midi_ch and msg.control in [1, 3, 4]:
+        if msg.type == 'control_change' and msg.channel == midi_ch and msg.control in [1, 2, 3]:
             if msg.control == 1:
-                if msg.value == 0:
-                    action = 'Play'
-                elif msg.value == 127:
-                    action = 'Stop'
+                action = 'Stop'
+            elif msg.control == 2:
+                action = 'Play Next'
             elif msg.control == 3:
                 action = f'Volume: {int(msg.value/127 * 100)}%'
-            elif msg.control == 4 and msg.value in range(1,6):
-                speed_msg = ['', '1x', '0.5x', '.75x', '1.25x', '1.5x']
-                action = f'Speed Control {speed_msg[msg.value]}'
+        elif msg.type == 'program_change' and msg.channel == midi_ch:
+            action = f'play loop {msg.program}'
         self.rv_list.append({'raw': raw, 'action': action})
-        self.ids.rv.scroll_y = 0
+        if self.ids.rv.height < self.ids.rbl.height:
+            self.ids.rv.scroll_y = 0
 
 
 class MidiLine(BoxLayout):
