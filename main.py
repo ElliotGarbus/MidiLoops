@@ -156,7 +156,7 @@ class MidiLoopsApp(App):
         self.recent_track_paths = []  # holds full path to the track
 
     def build(self):
-        self.title = 'MidiLoops V0'
+        self.title = 'MidiLoops V1.0'
         self.use_kivy_settings = False
         Window.minimum_width = window_width
         Window.minimum_height = window_height
