@@ -13,10 +13,6 @@ import functools
 import playscreen
 import monitorscreen
 
-#  todo: midi functionality
-#  todo: Update midi monior
-#  todo: update cc popup
-
 
 kv = """
 #:import Factory kivy.factory.Factory
