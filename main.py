@@ -21,14 +21,16 @@ import monitorscreen
 kv = """
 #:import Factory kivy.factory.Factory
 <MidiCCPopup@Popup>
-    title: 'Midi CC Assignments'
-    size_hint: .8, .8
+    title: 'Midi Assignments'
+    size_hint: None, None
+    size: dp(640), dp(340)
     BoxLayout:
         orientation: 'vertical'
         padding: dp(10)
         spacing: dp(10)
         GridLayout:
-            size_hint_y: .4
+            size_hint_y: None
+            height: 30 * 4
             cols: 3
             LeftLabel:
                 text: 'Action'
@@ -43,37 +45,38 @@ kv = """
                 bold: True
             
             LeftLabel:
-                text: 'Play'
-            CCLabel:
-                text: 'CC# 1'
-            RightLabel:
-                text: '0, Play & Stop are both on CC#1, can assigned to a toggle switch'
-                
-            LeftLabel:
                 text: 'Stop'
             CCLabel:
                 text: 'CC# 1'
             RightLabel:
-                text: '127'
+                text: 'Any, Stop Playing'
+                
+            LeftLabel:
+                text: 'Next'
+            CCLabel:
+                text: 'CC# 2'
+            RightLabel:
+                text: 'Any, Stop current loop, start the next loop'
             
             LeftLabel:
                 text: 'Volume'
             CCLabel:
                 text: 'CC# 3'
             RightLabel:
-                text: '0 - 127 can be assigned to a midi exp pedal'
-            
-            LeftLabel:
-                text: 'Speed'
-            CCLabel:
-                text: 'CC# 4'
-            RightLabel:
-                text: '1, 2, 3, 4, 5 for speeds  1x, 0.5x, .75x, 1.25x, 1.5x respectively'
+                text: '0 - 127, set volume for playing loop'
+        Label:
+            text: 'When a PC message associated with one of the loops is received the selected loop begins to play. ' \
+                  'If a different loop is playing when the PC message is received, the playing loop will stop, ' \
+                  'then the selected loop plays' 
+            text_size: self.size
+
         Button:
             size_hint_y: None
             height: dp(48)
             text: 'OK'
-            on_release: root.dismiss()
+            on_release:
+                print(root.size) 
+                root.dismiss()
 
 
 <LeftLabel@Label>:

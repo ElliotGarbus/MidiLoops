@@ -223,7 +223,9 @@ class PlayScreen(Screen):
             if track.sound.state == 'play':
                 i = loaded.index(track)
                 loaded[i].ids.tb.state = 'normal'
-                loaded[(i+1) % len(loaded)].ids.tb.state = 'down'
+                w = loaded[(i+1) % len(loaded)]
+                w.ids.tb.state = 'down'
+                self.ids.scroll.scroll_to(w)
                 break
 
     def set_volume(self, midi_vol):
@@ -256,8 +258,7 @@ class PlayScreen(Screen):
             try:
                 json.dump(playlist, f)
             except OSError as e:
-                # LOG ERROR HERE
-                Logger.exception(f'Application: Error is save_playlist: {e}')
+                Logger.exception(f'Application: Error in save_playlist: {e}')
 
     def load_playlist(self, path):
         p = Path(path) / 'playlist.txt'
