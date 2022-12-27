@@ -24,7 +24,7 @@ The MidiLoops can be controlled by the buttons on the app or a MIDI controller.
 
 **PC Messages**
 When a PC message associated with one of the loops is received the selected loop begins to play.  If a different loop is playing when the 
-PC message is received it will stop. The BackingTrackPlayer responds to the following MIDI messages:
+PC message is received it will stop. Midi Loops responds to the following MIDI messages:
 
 **CC Messages**
 
