@@ -15,7 +15,7 @@ import json
 Builder.load_string("""
 <ConfirmPopup>:
     size_hint: None, None
-    size: 400, 200
+    size: dp(400), dp(200)
     BoxLayout:
         orientation: 'vertical'
         Label:
@@ -34,7 +34,7 @@ Builder.load_string("""
 <ContentControl>:
     padding: dp(20)
     size_hint_y: None
-    height: 130
+    height: dp(130)
     canvas:
         Color:
             rgb: .5, .5, .5
@@ -44,8 +44,8 @@ Builder.load_string("""
     Label:
         text: f'{root.pc}'
         size_hint_x: None
-        width: 50
-        font_size: 20
+        width: dp(50)
+        font_size: sp(20)
     BoxLayout:
         orientation: 'vertical'
         BoxLayout:
@@ -62,7 +62,7 @@ Builder.load_string("""
                 text: 'X'
                 color: 'red'
                 size_hint_x: None
-                width: 20
+                width: dp(20)
                 disabled: tb.text == '<Empty>'
                 on_release: root.request_clear()
         BoxLayout:
@@ -74,7 +74,7 @@ Builder.load_string("""
             Label:
                 text: f'{volume.value:.0f}'
                 size_hint_x: None
-                width: 40
+                width: dp(40)
 
 <PlayScreen>:
     BoxLayout:

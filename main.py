@@ -24,7 +24,7 @@ kv = """
         spacing: dp(10)
         GridLayout:
             size_hint_y: None
-            height: 30 * 4
+            height: dp(30 * 4)
             cols: 3
             LeftLabel:
                 text: 'Action'
