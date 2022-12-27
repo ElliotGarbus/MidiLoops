@@ -4,14 +4,14 @@ import os
 
 spec_root = os.path.abspath(SPECPATH)
 block_cipher = None
-app_name = 'Backing Track Player'
+app_name = 'Midi Loops'
 mac_icon = '../icons8-refresh-512.icns'
 
 
 a = Analysis(['../main.py'],
              pathex=[spec_root],
              binaries=[],
-             datas=[('../ffmpeg', '.'), ('../*.png', '.')],
+             datas=[('../*.png', '.')],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
